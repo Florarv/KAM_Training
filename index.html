@@ -22,76 +22,98 @@
         #chat-container::-webkit-scrollbar-track { background: #F3F4F6; }
         #chat-container::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
         #briefing-panel { transition: transform 0.3s ease-in-out; }
+        
+        /* Ensure the main container respects the dynamic height */
+        #main-container {
+            height: 100vh; /* Fallback for desktop */
+        }
     </style>
 </head>
-<body class="bg-gray-100 flex h-screen">
+<body class="bg-gray-100">
 
-    <!-- Case Briefing Panel -->
-    <div id="briefing-panel" class="w-full md:w-1/3 lg:w-1/4 bg-white p-6 overflow-y-auto shadow-lg absolute md:relative inset-0 z-30 transform -translate-x-full md:translate-x-0">
-        <div class="flex justify-between items-center mb-4">
-            <h1 class="text-2xl font-bold text-gray-800">Your Mission</h1>
-            <button id="hideBriefingBtn" class="md:hidden p-2 rounded-full hover:bg-gray-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
+    <div id="main-container" class="w-full h-screen flex">
+        <!-- API Key Lobby -->
+        <div id="lobby" class="fixed inset-0 bg-gray-800 flex items-center justify-center z-50">
+            <div class="bg-white text-gray-800 rounded-lg shadow-2xl p-8 max-w-md w-11/12 text-center">
+                <h2 class="text-2xl font-bold mb-4">Welcome to the Silicorp Simulation</h2>
+                <p class="mb-6 text-gray-600">To begin, please enter your Gemini API key. The key will be stored only in your browser for this session.</p>
+                <input type="password" id="apiKeyInput" class="w-full border-2 border-gray-300 rounded-lg p-3 mb-4 text-center" placeholder="Paste your Gemini API key here">
+                <button id="startSimButton" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Start Simulation</button>
+                <a href="https://makersuite.google.com/app/apikey" target="_blank" class="block mt-4 text-sm text-blue-600 hover:underline">Get a free API key from Google AI Studio</a>
+                <p id="keyError" class="text-red-500 text-sm mt-2 h-4"></p>
+            </div>
         </div>
-        <div>
-            <h2 class="text-lg font-semibold text-gray-700 mb-2">Rebuilding a Strategic Partnership</h2>
-            <p class="text-sm text-gray-600 mb-4">You are **Sarah Jenkins**, Key Account Director at Silicorp. Your largest client, AutonoDrive, suffered a major market share loss after Silicorp failed to provide innovative support for their new product launch. The exclusive partnership is now at risk.</p>
-            <p class="text-sm text-gray-600 mb-4">Your customer, **Mark Chen (VP of Strategic Partnerships)**, is questioning the fundamental value of the partnership.</p>
-            <p class="text-sm text-gray-600 font-semibold">Your Goal: Convince Mark that Silicorp is still the right strategic partner for the future.</p>
-        </div>
-        <div class="mt-6">
-             <h2 class="text-lg font-semibold text-gray-800 mb-3">Account Vitals:</h2>
-            <ul class="list-disc list-inside text-sm text-gray-600 space-y-2">
-                <li>**Annual Revenue:** $400 Million (18% of Silicorp's total revenue).</li>
-                <li>**Profit Margin:** 35% (vs. company average of 28%).</li>
-                <li>**5-Year Growth Projection:** Expected to reach $750 Million annually.</li>
-                <li>**Status:** High-growth, high-profit, and strategically critical.</li>
-            </ul>
-        </div>
-        <div class="mt-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-3">Key Facts:</h2>
-            <ul class="list-disc list-inside text-sm text-gray-600 space-y-2">
-                <li>**The Crisis:** Your failure to innovate cost AutonoDrive a major market opportunity.</li>
-                <li>**The Threat:** AutonoDrive is actively meeting with your competitors.</li>
-            </ul>
-        </div>
-    </div>
 
-    <!-- Chat Interface -->
-    <div class="flex-1 flex flex-col bg-gray-200">
-        <header class="bg-white shadow-md p-4 flex items-center justify-between">
-            <div class="flex items-center">
-                <button id="showBriefingBtn" class="md:hidden mr-4 p-2 rounded-full hover:bg-gray-200">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
-                </button>
-                <div class="flex items-center">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 relative">
-                       <img src="https://placehold.co/80x80/4A5568/FFFFFF?text=M" alt="Mark Chen" class="rounded-full">
-                    </div>
-                    <div>
-                        <h2 id="participant-header" class="text-lg font-semibold text-gray-900">Mark Chen, VP Strategic Partnerships</h2>
-                        <p class="text-sm text-red-500 flex items-center"><span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>Partnership Under Review</p>
-                    </div>
+        <!-- Main Simulation UI (Initially Hidden) -->
+        <div id="simulation-ui" class="flex h-full w-full hidden">
+            <!-- Case Briefing Panel -->
+            <div id="briefing-panel" class="w-full md:w-1/3 lg:w-1/4 bg-white p-6 overflow-y-auto shadow-lg absolute md:relative inset-0 z-30 transform -translate-x-full md:translate-x-0">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-2xl font-bold text-gray-800">Your Mission</h1>
+                    <button id="hideBriefingBtn" class="md:hidden p-2 rounded-full hover:bg-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Rebuilding a Strategic Partnership</h2>
+                    <p class="text-sm text-gray-600 mb-4">You are **Sarah Jenkins**, Key Account Director at Silicorp. Your largest client, AutonoDrive, suffered a major market share loss after Silicorp failed to provide innovative support for their new product launch. The exclusive partnership is now at risk.</p>
+                    <p class="text-sm text-gray-600 mb-4">Your customer, **Mark Chen (VP of Strategic Partnerships)**, is questioning the fundamental value of the partnership.</p>
+                    <p class="text-sm text-gray-600 font-semibold">Your Goal: Convince Mark that Silicorp is still the right strategic partner for the future.</p>
+                </div>
+                <div class="mt-6">
+                     <h2 class="text-lg font-semibold text-gray-800 mb-3">Account Vitals:</h2>
+                    <ul class="list-disc list-inside text-sm text-gray-600 space-y-2">
+                        <li>**Annual Revenue:** $400 Million (18% of Silicorp's total revenue).</li>
+                        <li>**Profit Margin:** 35% (vs. company average of 28%).</li>
+                        <li>**5-Year Growth Projection:** Expected to reach $750 Million annually.</li>
+                        <li>**Status:** High-growth, high-profit, and strategically critical.</li>
+                    </ul>
+                </div>
+                <div class="mt-6">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Key Facts:</h2>
+                    <ul class="list-disc list-inside text-sm text-gray-600 space-y-2">
+                        <li>**The Crisis:** Your failure to innovate cost AutonoDrive a major market opportunity.</li>
+                        <li>**The Threat:** AutonoDrive is actively meeting with your competitors.</li>
+                    </ul>
                 </div>
             </div>
-        </header>
 
-        <div id="chat-container" class="flex-1 p-6 overflow-y-auto space-y-4"></div>
+            <!-- Chat Interface -->
+            <div class="flex-1 flex flex-col bg-gray-200">
+                <header class="bg-white shadow-md p-4 flex items-center justify-between flex-shrink-0">
+                    <div class="flex items-center">
+                        <button id="showBriefingBtn" class="md:hidden mr-4 p-2 rounded-full hover:bg-gray-200">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                        </button>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 relative">
+                               <img src="https://placehold.co/80x80/4A5568/FFFFFF?text=M" alt="Mark Chen" class="rounded-full">
+                            </div>
+                            <div>
+                                <h2 id="participant-header" class="text-lg font-semibold text-gray-900">Mark Chen, VP Strategic Partnerships</h2>
+                                <p class="text-sm text-red-500 flex items-center"><span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>Partnership Under Review</p>
+                            </div>
+                        </div>
+                    </div>
+                </header>
 
-        <footer class="bg-white p-4 border-t border-gray-300">
-            <div id="end-sim-options" class="hidden text-center">
-                <button id="reviewButton" class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700">✨ Get My Performance Review</button>
-                <button id="restartButton" class="ml-4 bg-gray-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600">Restart Simulation</button>
+                <div id="chat-container" class="flex-1 p-6 overflow-y-auto space-y-4"></div>
+
+                <footer class="bg-white p-4 border-t border-gray-300 flex-shrink-0">
+                    <div id="end-sim-options" class="hidden text-center">
+                        <button id="reviewButton" class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700">✨ Get My Performance Review</button>
+                        <button id="restartButton" class="ml-4 bg-gray-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600">Restart Simulation</button>
+                    </div>
+                    <div id="chat-input-area" class="flex items-center">
+                        <input type="text" id="userInput" class="flex-1 border-gray-300 rounded-full py-3 px-4" placeholder="Type your response...">
+                        <button id="suggestButton" class="ml-2 p-3 text-white bg-purple-600 rounded-full hover:bg-purple-700" title="Suggest a Reply">✨</button>
+                        <button id="sendButton" class="ml-2 bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        </button>
+                    </div>
+                </footer>
             </div>
-            <div id="chat-input-area" class="flex items-center">
-                <input type="text" id="userInput" class="flex-1 border-gray-300 rounded-full py-3 px-4" placeholder="Type your response...">
-                <button id="suggestButton" class="ml-2 p-3 text-white bg-purple-600 rounded-full hover:bg-purple-700" title="Suggest a Reply">✨</button>
-                <button id="sendButton" class="ml-2 bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                </button>
-            </div>
-        </footer>
+        </div>
     </div>
 
     <!-- Modals -->
@@ -122,6 +144,12 @@
     <script>
         // DOM Elements
         const elements = {
+            mainContainer: document.getElementById('main-container'),
+            lobby: document.getElementById('lobby'),
+            simulationUI: document.getElementById('simulation-ui'),
+            apiKeyInput: document.getElementById('apiKeyInput'),
+            startSimButton: document.getElementById('startSimButton'),
+            keyError: document.getElementById('keyError'),
             chatContainer: document.getElementById('chat-container'),
             userInput: document.getElementById('userInput'),
             sendButton: document.getElementById('sendButton'),
@@ -146,10 +174,18 @@
         // State
         let chatHistory = [];
         let turnCount = 0;
+        let apiKey = '';
 
-        // --- Netlify Function Call ---
+        // --- Mobile Viewport Height Fix ---
+        function setAppHeight() {
+            const doc = document.documentElement;
+            doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+            elements.mainContainer.style.height = `${window.innerHeight}px`;
+        }
+        window.addEventListener('resize', setAppHeight);
+        
+        // --- Gemini API Call Function ---
         async function callGemini(prompt, isJson = false) {
-            // This function now calls our secure Netlify backend function
             const apiUrl = `/.netlify/functions/getAiResponse`;
             try {
                 const response = await fetch(apiUrl, { 
@@ -167,6 +203,13 @@
                 console.error("Backend Call Error:", error);
                 return `Sorry, the AI assistant is currently unavailable. Error: ${error.message}`;
             }
+        }
+        
+        // --- Lobby Logic (Removed for this version, but keeping structure for potential future use) ---
+        function initializeSim() {
+            elements.lobby.classList.add('hidden');
+            elements.simulationUI.classList.remove('hidden');
+            startConversation();
         }
 
         // --- Modal & UI Functions ---
@@ -195,21 +238,16 @@
 
         function addMessageToChat(speaker, message) {
             const isUser = speaker.startsWith('Sarah');
-            
             const messageWrapper = document.createElement('div');
             messageWrapper.className = `flex items-end gap-2 ${isUser ? 'justify-end' : ''}`;
-
             const avatar = document.createElement('img');
             avatar.className = 'w-8 h-8 rounded-full flex-shrink-0';
-            
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'}`;
             bubble.textContent = message;
-
             let avatarUrl = isUser ? 'https://placehold.co/40x40/E2E8F0/4A5568?text=S' : 'https://placehold.co/40x40/4A5568/FFFFFF?text=M';
             avatar.src = avatarUrl;
             avatar.alt = `${speaker} avatar`;
-
             if (isUser) {
                 messageWrapper.appendChild(bubble);
                 messageWrapper.appendChild(avatar);
@@ -217,7 +255,6 @@
                 messageWrapper.appendChild(avatar);
                 messageWrapper.appendChild(bubble);
             }
-            
             elements.chatContainer.appendChild(messageWrapper);
             elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
             chatHistory.push(`${speaker}: ${message}`);
@@ -226,21 +263,15 @@
         async function handleUserInput() {
             const message = elements.userInput.value.trim();
             if (!message) return;
-
             addMessageToChat('Sarah (You)', message);
             elements.userInput.value = '';
             turnCount++;
-
             setInputsDisabled(true);
-
-            // Event Triggers
             if (turnCount === 2) {
                 showPressureAlert("That exclusivity clause is our biggest leverage. Do not give it up without a major financial commitment from their side.", "VP of Sales");
             }
-            
             const aiResponse = await getDynamicAIResponse();
             addMessageToChat('Mark Chen', aiResponse);
-            
             setInputsDisabled(false);
             if (turnCount >= 5) {
                 elements.chatInputArea.classList.add('hidden');
@@ -264,7 +295,6 @@
                 **Conversation History:**
                 ${historyText}
                 **Based on Sarah's last message, what is your direct response?**`;
-            
             openModal('✨ AI Assistant', `<p>Mark is thinking...</p>`);
             const response = await callGemini(prompt);
             closeModalFunction();
@@ -313,6 +343,9 @@
         }
 
         // --- Event Listeners ---
+        // Hiding lobby listeners for this version, but keeping them for easy toggling
+        // elements.startSimButton.addEventListener('click', validateAndStart);
+        // elements.apiKeyInput.addEventListener('keydown', (e) => e.key === 'Enter' && validateAndStart());
         elements.sendButton.addEventListener('click', handleUserInput);
         elements.userInput.addEventListener('keydown', (e) => e.key === 'Enter' && handleUserInput());
         elements.suggestButton.addEventListener('click', handleSuggestReply);
@@ -324,7 +357,14 @@
         elements.showBriefingBtn.addEventListener('click', () => elements.briefingPanel.classList.remove('-translate-x-full'));
         elements.hideBriefingBtn.addEventListener('click', () => elements.briefingPanel.classList.add('-translate-x-full'));
 
-        window.onload = startConversation;
+        // --- Initial Load ---
+        window.onload = () => {
+            setAppHeight();
+            // In this version, we bypass the lobby and start directly
+            elements.lobby.classList.add('hidden');
+            elements.simulationUI.classList.remove('hidden');
+            startConversation();
+        };
     </script>
 </body>
 </html>
