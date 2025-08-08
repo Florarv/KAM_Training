@@ -1,0 +1,14 @@
+{
+  "name": "silicorp-simulation-backend",
+  "version": "1.0.0",
+  "description": "Backend function for the Silicorp simulation.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  }
+}
